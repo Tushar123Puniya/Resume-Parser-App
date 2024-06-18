@@ -67,14 +67,6 @@ def AboutUs_page(request):
 
 def ContactUs_page(request):
     return render(request, 'Home/contactus_page.html', {})
-
-def download_csv(request,filename):
-    filepath = os.path.join(settings.MEDIA_ROOT, filename)
-    if os.path.exists(filepath):
-        response = FileResponse(open(filepath, 'rb'), as_attachment=True)
-        return response
-    else:
-        return HttpResponse(status=404)
     
 def Parsing_page(request):
     if request.method == 'POST':
@@ -84,9 +76,8 @@ def Parsing_page(request):
             form.add_error(None,'Please select at least one resume')
         elif form.is_valid():
             resumes = request.FILES.getlist('resumes')
-            main(resumes)
-            csv_filename = "parsed_data.csv"
+            csv_filename = main(resumes)
+            return csv_filename
     else:
         form = ResumeUploadForm()
-        csv_filename=""
-    return render(request,'Home/parsing_page.html', {'form':form,'csv_filename':csv_filename})
+    return render(request,'Home/parsing_page.html', {'form':form})
