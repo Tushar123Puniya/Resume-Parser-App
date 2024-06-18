@@ -69,7 +69,7 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 def main(files):
     df = []
     client = OpenAI(
-        api_key="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"
+        api_key=""
     )
     for file in files:
         content = parse_resume_content(file)
