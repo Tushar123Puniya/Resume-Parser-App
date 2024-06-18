@@ -53,7 +53,9 @@ def extract_text(content):
         text += current_page.extract_text()
     return text
 
-
+client = OpenAI(
+        api_key=""
+    )
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
     messages = [{"role": "user", "content": prompt}]
@@ -68,9 +70,6 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 
 def main(files):
     df = []
-    client = OpenAI(
-        api_key=""
-    )
     for file in files:
         content = parse_resume_content(file)
         if content:
