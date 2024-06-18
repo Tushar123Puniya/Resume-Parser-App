@@ -8,5 +8,4 @@ urlpatterns = [
     path('aboutus', views.AboutUs_page, name='AboutUs_page'),
     path('contactus', views.ContactUs_page, name='ContactUs_page'),
     path('parsing', views.Parsing_page, name='Parsing_page'),
-    path('download/<str:filename>/', views.download_csv, name='download_csv')
 ]
