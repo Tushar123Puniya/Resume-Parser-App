@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | Resume Parser and Scorer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <style>
+        body {
+            background-color: #f9f8f8;
+        }
+        .hero {
+            background: linear-gradient(135deg, #ff8a00 0%, #e52e71 100%);
+            color: white;
+        }
+        .hero-body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .box {
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            margin: 20px auto 0;
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        .button.is-primary {
+            background: linear-gradient(135deg, #ff8a00 0%, #e52e71 100%);
+            border: none;
+        }
+        .button.is-primary:hover {
+            background: linear-gradient(135deg, #e52e71 0%, #ff8a00 100%);
+            animation: shake 0.5s;
+            animation-iteration-count: 1;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .navbar {
+            background-color: #432020;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand .navbar-item {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .navbar-menu {
+            margin-left: auto;
+        }
+        .navbar-item {
+            color: #ff8a00;
+        }
+        .navbar-item:hover {
+            background-color: #ff8a00;
+            color: white;
+        }
+        .intro-section {
+            background-color: #ffffff;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .intro-section h2 {
+            color: #432020;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .intro-section p {
+            color: #555555;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            line-height: 1.6;
+        }
+        .reviews-section {
+            background-color: #432020;
+            padding: 50px 0;
+            text-align: center;
+        }
+        .reviews {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .review {
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+        .review img {
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        .review .name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #432020;
+        }
+        .review .text {
+            font-size: 0.9rem;
+            color: #555555;
+        }
+        .typing {
+            border-right: 2px solid;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .typing-container {
+            height: 2.5em; /* Adjust this height according to your font size */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px; /* Adjust spacing between text and box */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="#">
+                ParseMinds
+            </a>
+        </div>
+        <div class="navbar-menu">
+            <div class="navbar-end">
+                <a class="navbar-item" href="{% url 'AboutUs_page' %}">
+                    About Us
+                </a>
+                <a class="navbar-item" href="{% url 'ContactUs_page' %}">
+                    Contact Us
+                </a>
+            </div>
+        </div>
+    </nav>
+    <section class="hero is-fullheight">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title is-1">
+                    Resume Parser and Scorer
+                </h1>
+                <div class="typing-container">
+                    <h2 class="subtitle is-3 typing" id="typing-text">
+                        let's parse resumes with ai
+                    </h2>
+                </div>
+                <div class="box">
+                    <div class="field">
+                        <div class="control">
+                            <a href="{% url 'Signup_page' %}" class="button is-primary is-fullwidth is-large">
+                                Sign Up
+                            </a>
+                        </div>
+                    </div> 
+                    <div class="field">
+                        <div class="control">
+                            <a href="{% url 'Login_page' %}" class="button is-primary is-fullwidth is-large">
+                                Login
+                            </a>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="intro-section">
+        <div class="container">
+            <h2>Welcome to ParseMinds</h2>
+            <p>
+                ParseMinds is the cutting-edge solution designed to streamline your recruitment process with the power of artificial intelligence. Our platform specializes in parsing resumes and dynamically scoring them against job descriptions, ensuring you find the best candidates with ease.
+            </p>
+            <p>
+                At ParseMinds, we understand that sifting through countless resumes can be time-consuming and overwhelming. That's why we've developed an advanced resume parser that not only extracts critical information but also evaluates each resume based on your specific job criteria. Our AI-driven technology ensures accuracy, efficiency, and unbiased results, helping you make informed hiring decisions faster than ever before.
+            </p>
+            <p>
+                Whether you're a large corporation or a growing startup, ParseMinds is here to simplify your hiring process. Join us and experience the future of recruitment today!
+            </p>
+        </div>
+    </section>
+    <section class="reviews-section">
+        <div class="container">
+            <h2 class="title is-2" style="color: white;">What Our Clients Say</h2>
+            <div class="reviews">
+                {% for review in reviews %}
+                <div class="review">
+                    <img src="{{ review.image_url }}" alt="{{ review.name }}" width="100" height="100">
+                    <div class="name">{{ review.name }}</div>
+                    <div class="text">{{ review.text }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textElement = document.getElementById('typing-text');
+            const text = textElement.textContent;
+            let index = 0;
+            let isDeleting = false;
+
+            function type() {
+                if (isDeleting) {
+                    textElement.textContent = text.slice(0, index--);
+                } else {
+                    textElement.textContent = text.slice(0, index++);
+                }
+
+                if (!isDeleting && index === text.length) {
+                    setTimeout(() => isDeleting = true, 100);
+                } else if (isDeleting && index === 0) {
+                    setTimeout(() => {
+                        isDeleting = false;
+                    }, 0);
+                }
+
+                setTimeout(type, isDeleting ? 50 : 50);
+            }
+
+            type();
+        });
+    </script>
+</body>
+</html>

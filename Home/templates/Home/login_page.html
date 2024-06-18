@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | ParseMinds</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <style>
+        body {
+            background-color: #b34848;
+        }
+        .navbar {
+            background-color: #432020;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand .navbar-item {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+        .navbar-menu {
+            margin-left: auto;
+        }
+        .navbar-item {
+            color: #ff8a00;
+        }
+        .navbar-item:hover {
+            background-color: #ff8a00;
+            color: white;
+        }
+        .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .field label {
+            font-weight: bold;
+        }
+        .field input {
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .field input[type="submit"] {
+            background-color: #ff8a00;
+            color: #fff;
+            cursor: pointer;
+        }
+        .field input[type="submit"]:hover {
+            background-color: #e52e71;
+        }
+        .error-message {
+            color: #e52e71;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        html {
+            background-color: #b34848;
+            font-size: 16px;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-font-smoothing: antialiased;
+            min-width: 300px;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            text-rendering: optimizeLegibility;
+            -webkit-text-size-adjust: 100%;
+            -moz-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="#">
+                ParseMinds
+            </a>
+        </div>
+        <div class="navbar-menu">
+            <div class="navbar-end">
+                <a class="navbar-item" href="{% url 'Home_page' %}">
+                    Home
+                </a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="form-container">
+            <h2 class="title is-3 has-text-centered">Login</h2>
+            <form method="POST" action="{% url 'Login_page' %}">
+                {% csrf_token %}
+                <div class="field">
+                    {{ form.email.label_tag }}
+                    <div class="control">
+                        {{ form.email }}
+                    </div>
+                    {% for error in form.email.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                <div class="field">
+                    {{ form.password.label_tag }}
+                    <div class="control">
+                        {{ form.password }}
+                    </div>
+                    {% for error in form.password.errors %}
+                        <p class="help is-danger">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                <div class="field">
+                    <input type="submit" value="Login" class="button is-primary">
+                </div>
+                {% if form.non_field_errors %}
+                    <div class="notification is-danger">
+                        <ul>
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>   
+</body>
+</html>

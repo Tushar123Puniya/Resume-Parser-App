@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Resumes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white; /* Changed background color to orange */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            overflow: hidden;
+            padding: 2em;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+            text-align: center; /* Center content */
+            position: relative; /* Relative positioning for loading indicator */
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center form elements */
+        }
+        label {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 0.5em;
+        }
+        input[type="file"] {
+            margin-bottom: 1em;
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 200px; /* Limit width for larger screens */
+        }
+        input[type="submit"] {
+            padding: 0.7em 1.5em;
+            border: none;
+            background: #333;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background: orange; /* Adjusted hover color to match background */
+        }
+        .download-link {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 0.7em;
+            margin-top: 1em;
+            background: #333;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if not csv_filename %}
+        <h1>Upload Resumes</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="resumes">Select Resumes:</label>
+            <input type="file" id="resumes" name="resumes" multiple>
+            <input type="submit" value="Upload">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </form>
+        {% endif %}
+        {% if csv_filename %}
+        <h1>Download Parsed CSV</h1>
+        <a href="{% url 'download_csv' csv_filename %}" class="download-link">Download CSV</a>
+        {% endif %}
+    </div>
+</body>
+</html>
