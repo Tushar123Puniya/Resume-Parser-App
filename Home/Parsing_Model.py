@@ -16,11 +16,6 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from the .env file
-load_dotenv()
-
-# Get the API key from the environment variables
-
 keys =['Name','Email','Phone Number','Highest Education Degree','Highest Education Institute','CGPA','Passing Year','Useful Links','Skills','Self-Projects','Internships/Job Experience','Overall Summary']
 
 template = f"""
@@ -58,9 +53,7 @@ def extract_text(content):
         text += current_page.extract_text()
     return text
 
-client = OpenAI(
-    api_key="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"
-)
+
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
     messages = [{"role": "user", "content": prompt}]
@@ -75,6 +68,9 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 
 def main(files):
     df = []
+    client = OpenAI(
+        api_key="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"
+    )
     for file in files:
         content = parse_resume_content(file)
         if content:
