@@ -11,10 +11,10 @@ import PyPDF2
 import os
 from openai import OpenAI
 import json
-import pandas as pd
-
+import csv
 from dotenv import load_dotenv
 import os
+from django.http import HttpResponse
 
 keys =['Name','Email','Phone Number','Highest Education Degree','Highest Education Institute','CGPA','Passing Year','Useful Links','Skills','Self-Projects','Internships/Job Experience','Overall Summary']
 
@@ -53,8 +53,11 @@ def extract_text(content):
         text += current_page.extract_text()
     return text
 
+load_dotenv()
+api_key=os.getenv("OPENAI_API_KEY")
+
 client = OpenAI(
-        api_key=""
+        api_key=api_key
     )
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
@@ -69,16 +72,25 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 
 
 def main(files):
-    df = []
+    data = []
     for file in files:
         content = parse_resume_content(file)
         if content:
             row = []
             for j in keys:
                 row.append(content[j])
-            df.append(row)
-    df = pd.DataFrame(df, columns=keys)
-    df.to_csv('parsed_data.csv')   
+            data.append(row)
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="parsed_data.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(keys)
+
+    for row in data:
+        writer.writerow(row)
+
+    return response
          
 
 

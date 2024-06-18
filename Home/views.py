@@ -84,9 +84,8 @@ def Parsing_page(request):
             form.add_error(None,'Please select at least one resume')
         elif form.is_valid():
             resumes = request.FILES.getlist('resumes')
-            main(resumes)
-            csv_filename = "parsed_data.csv"
+            csv_filename = main(resumes)
+            return csv_filename
     else:
         form = ResumeUploadForm()
-        csv_filename=""
-    return render(request,'Home/parsing_page.html', {'form':form,'csv_filename':csv_filename})
+    return render(request,'Home/parsing_page.html', {'form':form})

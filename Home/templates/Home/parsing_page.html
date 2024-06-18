@@ -73,22 +73,16 @@
 </head>
 <body>
     <div class="container">
-        {% if not csv_filename %}
         <h1>Upload Resumes</h1>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <label for="resumes">Select Resumes:</label>
             <input type="file" id="resumes" name="resumes" multiple>
-            <input type="submit" value="Upload">
+            <input type="submit" value="Download Parsed CSVs">
             {% for error in form.non_field_errors %}
                 <li>{{ error }}</li>
             {% endfor %}
         </form>
-        {% endif %}
-        {% if csv_filename %}
-        <h1>Download Parsed CSV</h1>
-        <a href="{% url 'download_csv' csv_filename %}" class="download-link">Download CSV</a>
-        {% endif %}
     </div>
 </body>
 </html>
