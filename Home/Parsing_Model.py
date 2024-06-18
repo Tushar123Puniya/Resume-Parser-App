@@ -20,7 +20,7 @@ import os
 load_dotenv()
 
 # Get the API key from the environment variables
-api_key = os.getenv('API_KEY')
+api_key = "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"
 
 keys =['Name','Email','Phone Number','Highest Education Degree','Highest Education Institute','CGPA','Passing Year','Useful Links','Skills','Self-Projects','Internships/Job Experience','Overall Summary']
 
