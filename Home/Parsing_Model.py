@@ -14,6 +14,7 @@ import json
 import csv
 from dotenv import load_dotenv
 import os
+from django.http import HttpResponse
 
 keys =['Name','Email','Phone Number','Highest Education Degree','Highest Education Institute','CGPA','Passing Year','Useful Links','Skills','Self-Projects','Internships/Job Experience','Overall Summary']
 
@@ -80,18 +81,17 @@ def main(files):
                 row.append(content[j])
             data.append(row)
     
-    csv_file = "parsed_data.csv"
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="parsed_data.csv"'
 
-    with open(csv_file, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        
-        # Write the header
-        writer.writerow(keys)
-        
-        # Write the data rows
-        for row in data:
-            writer.writerow(row) 
+    writer = csv.writer(response)
+    writer.writerow(keys)
+
+    for row in data:
+        writer.writerow(row)
+
+    return response
          
-    
+
 
 
