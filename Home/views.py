@@ -80,8 +80,4 @@ def Parsing_page(request):
             return csv_filename
     else:
         form = ResumeUploadForm()
-<<<<<<< HEAD
     return render(request,'Home/parsing_page.html', {'form':form})
-=======
-    return render(request,'Home/parsing_page.html', {'form':form})
->>>>>>> 6195e3411a7dfc1ac7be5cf71b28f0389ed8915e
