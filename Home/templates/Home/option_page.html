@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Processing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 16px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .button.parse {
+            background: #4caf50;
+        }
+        .button.score {
+            background: #2196f3;
+        }
+        .button.parse:hover {
+            background: #45a049;
+        }
+        .button.score:hover {
+            background: #1e88e5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>What do you want to do?</h1>
+        <a href="parsing" class="button parse">Parse Resumes</a>
+        <br>
+        <a href="scoring" class="button score">Score Resumes Based on Job Description</a>
+    </div>
+</body>
+</html>

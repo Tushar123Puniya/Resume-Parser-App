@@ -1,14 +1,13 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
-from .forms import UserRegistrationForm,LoginForm
+from .forms import UserRegistrationForm,LoginForm,ResumeUploadForm,ScoreForm
 from django.contrib.auth.hashers import check_password
 from .models import User
 import csv
 import os
-from .forms import ResumeUploadForm
 from django.http import HttpResponse,FileResponse
 from django.conf import settings
-from .Parsing_Model import main
+from .Parsing_Model import parsing_only,similarity_scoring
 
 # Create your views here.
 def Home_page(request):
@@ -37,7 +36,7 @@ def Signup_page(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Your account has been created successfully!')
-            return redirect('Parsing_page')
+            return redirect('Option_page')
     else:
         form = UserRegistrationForm()
     return render(request, 'Home/signup_page.html', {'form':form})
@@ -51,7 +50,7 @@ def Login_page(request):
             try:
                 user = User.objects.get(email=email)
                 if check_password(password, user.password):
-                    return redirect('Parsing_page')  # Redirect to a success page.
+                    return redirect('Option_page')  # Redirect to a success page.
                 else:
                     form.add_error(None, 'Invalid email or password')
             except User.DoesNotExist:
@@ -68,6 +67,9 @@ def AboutUs_page(request):
 def ContactUs_page(request):
     return render(request, 'Home/contactus_page.html', {})
     
+def Option_page(request):
+    return render(request, 'Home/option_page.html')
+    
 def Parsing_page(request):
     if request.method == 'POST':
         form = ResumeUploadForm(request.POST, request.FILES)
@@ -76,8 +78,37 @@ def Parsing_page(request):
             form.add_error(None,'Please select at least one resume')
         elif form.is_valid():
             resumes = request.FILES.getlist('resumes')
-            csv_filename = main(resumes)
+            csv_filename = parsing_only(resumes)
             return csv_filename
     else:
         form = ResumeUploadForm()
     return render(request,'Home/parsing_page.html', {'form':form})
+
+def Scoring_page(request):
+    if request.method == 'POST':
+        form = ScoreForm(request.POST,request.FILES)
+        resumes = request.FILES.getlist('resumes[]')
+        job_description = request.FILES.get('job_description')
+        
+        # Handle scoring options
+        scoring_option = request.POST.get('scoring_option')
+        
+        print(resumes,' ',job_description)
+        
+        if not resumes:
+            form.add_error('Please upload at least one resume')
+        
+        if not job_description:
+            form.add_error('Please add job description')
+            
+        if scoring_option == 'dynamic':
+            criteria_order = request.POST.get('criteria_order', '').split(',')
+        
+        else:
+            print('Hello')
+            csv_filename=similarity_scoring(resumes,job_description)
+            return csv_filename
+    else:
+        form = ScoreForm()
+        
+    return render(request, 'Home/scoring_page.html',{'form':form})

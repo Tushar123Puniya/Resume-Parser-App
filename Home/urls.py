@@ -7,5 +7,7 @@ urlpatterns = [
     path('signup', views.Signup_page, name='Signup_page'),
     path('aboutus', views.AboutUs_page, name='AboutUs_page'),
     path('contactus', views.ContactUs_page, name='ContactUs_page'),
+    path('option', views.Option_page, name='Option_page'),
     path('parsing', views.Parsing_page, name='Parsing_page'),
+    path('scoring', views.Scoring_page, name='Scoring_page'),
 ]

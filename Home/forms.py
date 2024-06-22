@@ -52,3 +52,7 @@ class LoginForm(forms.Form):
     
 class ResumeUploadForm(forms.Form):
     resumes = forms.FileField(widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': True}))
+    
+class ScoreForm(forms.Form):
+    resumes = forms.FileField(widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': True}))
+    resumes = forms.FileField(widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': False}))
