@@ -7,7 +7,7 @@ import csv
 import os
 from django.http import HttpResponse,FileResponse
 from django.conf import settings
-from .Parsing_Model import parsing_only,similarity_scoring
+from .Parsing_Model import parsing_only,similarity_scoring,dynamic_scoring
 
 # Create your views here.
 def Home_page(request):
@@ -61,11 +61,9 @@ def Login_page(request):
         form = LoginForm()
     return render(request, 'Home/login_page.html', {'form': form})
 
-def AboutUs_page(request):
-    return render(request, 'Home/aboutus_page.html', {})
-
-def ContactUs_page(request):
-    return render(request, 'Home/contactus_page.html', {})
+def Passwordreset_page(request):
+    
+    return render(request, 'Home/passwordreset_page.html', {})
     
 def Option_page(request):
     return render(request, 'Home/option_page.html')
@@ -84,6 +82,7 @@ def Parsing_page(request):
         form = ResumeUploadForm()
     return render(request,'Home/parsing_page.html', {'form':form})
 
+
 def Scoring_page(request):
     if request.method == 'POST':
         form = ScoreForm(request.POST,request.FILES)
@@ -93,20 +92,20 @@ def Scoring_page(request):
         # Handle scoring options
         scoring_option = request.POST.get('scoring_option')
         
-        print(resumes,' ',job_description)
-        
-        if not resumes:
-            form.add_error('Please upload at least one resume')
-        
-        if not job_description:
-            form.add_error('Please add job description')
+        if scoring_option=='simple':
+            print(scoring_option)
+            if not resumes:
+                form.add_error('Please upload at least one resume')
             
-        if scoring_option == 'dynamic':
-            criteria_order = request.POST.get('criteria_order', '').split(',')
-        
-        else:
-            print('Hello')
-            csv_filename=similarity_scoring(resumes,job_description)
+            if not job_description:
+                form.add_error('Please add job description')
+                
+            else:
+                csv_filename=similarity_scoring(resumes,job_description)
+                return csv_filename
+        else :
+            criteria_options = request.POST.getlist('criteria_options[]')
+            csv_filename=dynamic_scoring(resumes,job_description,criteria_options)
             return csv_filename
     else:
         form = ScoreForm()

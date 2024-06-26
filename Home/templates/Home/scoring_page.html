@@ -17,6 +17,26 @@
             background: linear-gradient(to right, #4facfe, #00f2fe);
             margin: 0;
         }
+        .navbar {
+            background-color: #432020;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            position: absolute;
+            top: 0;
+        }
+        .navbar-menu {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .navbar-item {
+            color: #ff8a00;
+            padding: 10px;
+            text-decoration: none;
+        }
+        .navbar-item:hover {
+            background-color: #ff8a00;
+            color: white;
+        }
         .container {
             width: 80%;
             max-width: 800px;
@@ -69,20 +89,16 @@
         .button.submit:hover {
             background-color: #45a049;
         }
-        .sortable-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .sortable-item {
-            background-color: #f0f0f0;
-            padding: 10px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-            cursor: move;
-        }
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <div class="navbar-menu">
+            <a class="navbar-item" href="{% url 'Option_page' %}">
+                Home
+            </a>
+        </div>
+    </nav>
     <div class="container">
         <h1 class="title is-3 has-text-centered">Resume Scoring</h1>
         <form id="resume-scoring-form" method="POST" enctype="multipart/form-data" action="{% url 'Scoring_page' %}">
@@ -92,53 +108,50 @@
                 <div class="control">
                     <label class="file">
                         <input type="file" name="resumes[]" multiple required>
-                        <span class="file-label">
-                            Choose files...
+                        <span class="file-label" id="resume-file-label">
+                            Choose files
                         </span>
                     </label>
                 </div>
             </div>
             
-            <!-- Upload Job Description -->
             <div class="field">
                 <label class="label">Upload Job Description:</label>
                 <div class="control">
                     <label class="file">
                         <input type="file" name="job_description" required>
-                        <span class="file-label">
-                            Choose file...
+                        <span class="file-label" id="job-description-file-label">
+                            Choose file
                         </span>
                     </label>
                 </div>
             </div>
             
-            <!-- Scoring Options -->
             <div class="field">
                 <label class="label">Scoring Options:</label>
                 <div class="control select-wrapper">
                     <div class="select">
                         <select id="scoring-options" name="scoring_option">
-                            <option value="similarity">Simple Similarity</option>
+                            <option value="simple">Simple Scoring</option>
                             <option value="dynamic">Dynamic Scoring</option>
                         </select>
                     </div>
                 </div>
             </div>
             
-            <!-- Dynamic Scoring Criteria (hidden by default) -->
             <div id="dynamic-options" style="display: none;">
                 <div class="field">
-                    <label class="label">Select and Shuffle Criteria (based on priority):</label>
+                    <label class="label">Select Criteria:</label>
                     <div class="control">
-                        <ul class="sortable-list" id="sortable-list">
-                            <li class="sortable-item" data-id="college">College</li>
-                            <li class="sortable-item" data-id="cgpa">CGPA</li>
-                            <li class="sortable-item" data-id="skills">Skills</li>
-                            <li class="sortable-item" data-id="passing-year">Passing Year</li>
-                            <li class="sortable-item" data-id="experience">Experience</li>
-                        </ul>
+                        <label class="checkbox">
+                            <input type="checkbox" name="criteria_options[]" value="total work experience (in months)">
+                            Years of Experience  
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" name="criteria_options[]" value="cgpa">
+                            CGPA
+                        </label>
                     </div>
-                    <p class="help">Drag and drop to reorder.</p>
                 </div>
             </div>
             
@@ -153,9 +166,20 @@
         document.addEventListener('DOMContentLoaded', function () {
             const scoringOptions = document.getElementById('scoring-options');
             const dynamicOptions = document.getElementById('dynamic-options');
-            const sortable = new Sortable(document.getElementById('sortable-list'), {
-                animation: 150,
-                ghostClass: 'sortable-ghost'
+
+            const resumeFileInput = document.querySelector('input[name="resumes[]"]');
+            const resumeFileLabel = document.getElementById('resume-file-label');
+            const jobDescriptionFileInput = document.querySelector('input[name="job_description"]');
+            const jobDescriptionFileLabel = document.getElementById('job-description-file-label');
+
+            resumeFileInput.addEventListener('change', function () {
+                const fileCount = resumeFileInput.files.length;
+                resumeFileLabel.textContent = fileCount > 0 ? `${fileCount} file(s) chosen` : 'Choose files';
+            });
+
+            jobDescriptionFileInput.addEventListener('change', function () {
+                const fileCount = jobDescriptionFileInput.files.length;
+                jobDescriptionFileLabel.textContent = fileCount > 0 ? `${fileCount} file(s) chosen` : 'Choose file';
             });
 
             scoringOptions.addEventListener('change', function () {
@@ -164,16 +188,6 @@
                 } else {
                     dynamicOptions.style.display = 'none';
                 }
-            });
-
-            document.getElementById('resume-scoring-form').addEventListener('submit', function (e) {
-                // Include the order of criteria in the form submission
-                const selectedCriteria = Array.from(sortable.el.children).map(item => item.dataset.id);
-                const criteriaInput = document.createElement('input');
-                criteriaInput.type = 'hidden';
-                criteriaInput.name = 'criteria_order';
-                criteriaInput.value = selectedCriteria.join(',');
-                this.appendChild(criteriaInput);
             });
         });
     </script>

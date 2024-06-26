@@ -100,10 +100,11 @@ def similarity_scoring(files,JD):
     job_description = extract_text(JD)
 
     template = f"""
-    You are an expert in parsing curriculum vitaes and resumes.
-    Score the given resume based on the similarity between the job description 
-    and projects mentioned in the resume.Output everything in json format 
-    with keys in this format {keys}.
+    You are an expert in scoring curriculum vitaes and resumes on basis of Job Description.
+    Score the given resume(on scale between 0 and 1 both inclusive) based on the similarity between the job description 
+    and projects/work experience as mentioned in the resume. Restrict yourself to projects/work-experience of 
+    the candidates for scoring. Score based on matching of priority skills required according to the job. 
+    Also output your reasoning for the scoring. Output everything in json format with keys in this format {keys}.
 
     Job Description:
     {job_description}
@@ -120,6 +121,89 @@ def similarity_scoring(files,JD):
                 row.append(content[j])
             data.append(row)
     
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="scored_resumes.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(keys)
+
+    for row in data:
+        writer.writerow(row)
+
+    return response
+
+def dynamic_scoring(files,JD,criterias):
+    keys=['Name','Score','cgpa','total work experience (in months)']
+    
+    job_description = extract_text(JD)
+
+    template = f"""
+    You are an expert in scoring curriculum vitaes and resumes on basis of Job Description.
+    Score the given resume(on scale between 0 and 1 both inclusive) based on the similarity between the job description 
+    and projects/work experience as mentioned in the resume. Restrict yourself to projects/work-experience of 
+    the candidates for scoring. Score based on matching of priority skills required according to the job. 
+    Also output cgpa and total work experience (in months) of the candidate. 
+    Output everything in valid json format with keys in this format {keys}.
+
+    Job Description:
+    {job_description}
+
+    Resume:
+    """
+    
+    data = []
+    for file in files:
+        content = parse_resume_content(file,template=template)
+        if content:
+            row = []
+            for j in keys:
+                row.append(content[j])
+            data.append(row)
+    
+    score_id=1
+    cgpa_id=2
+    exp_id=3
+    
+    for i in range(len(data)):
+        try:
+            data[i][score_id]=float(data[i][score_id])
+        except:
+            data[i][score_id]=0
+            
+        try:
+            data[i][exp_id]=float(data[i][exp_id])
+        except:
+            data[i][exp_id]=0
+                
+        try :
+            data[i][cgpa_id]=float(data[i][cgpa_id])
+        except:
+            data[i][cgpa_id]=7
+    
+    max_cgpa=-1
+    max_exp=-1
+    
+    for i in range(len(data)):
+        max_cgpa = max(max_cgpa,data[i][cgpa_id])
+        max_exp = max(max_exp,data[i][exp_id])
+    
+    mappings={
+        'total work experience (in months)':exp_id,
+        'cgpa':cgpa_id
+    }
+    nmappings={
+        'total work experience (in months)':max_exp,
+        'cgpa':max_cgpa
+    }
+            
+    for i in range(len(data)):
+        dynamic_score = 0
+        k = len(criterias)
+        for x in criterias:
+            u=nmappings[x]    
+            dynamic_score += (1/k)*(data[i][mappings[x]]/u)
+        data[i][score_id]= round(0.8*(data[i][score_id]) + 0.2*dynamic_score,2)
+        
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="scored_resumes.csv"'
 
