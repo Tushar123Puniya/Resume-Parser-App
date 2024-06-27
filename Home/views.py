@@ -1,6 +1,6 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
-from .forms import UserRegistrationForm_email,LoginForm,ResumeUploadForm,ScoreForm,UserRegistrationForm
+from .forms import UserRegistrationForm_email,LoginForm,ResumeUploadForm,ScoreForm,UserRegistrationForm,passwordreset
 from django.contrib.auth.hashers import check_password
 from .models import User
 from django.conf import settings
@@ -8,7 +8,7 @@ from .Parsing_Model import parsing_only,similarity_scoring,dynamic_scoring
 from django.core.mail import send_mail
 import random
 from django.contrib.auth.hashers import make_password
-
+from django.urls import reverse
 
 # Create your views here.
 def Home_page(request):
@@ -100,7 +100,8 @@ def Login_page(request):
             try:
                 user = User.objects.get(email=email)
                 if check_password(password, user.password):
-                    return redirect('Option_page')  # Redirect to a success page.
+                    request.session['email']=email
+                    return redirect('Option_page')  
                 else:
                     form.add_error(None, 'Invalid email or password')
             except User.DoesNotExist:
@@ -112,8 +113,41 @@ def Login_page(request):
     return render(request, 'Home/login_page.html', {'form': form})
 
 def Passwordreset_page(request):
+    message={
+        'error':'',
+        'success':''
+    }
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        request.session['email']=email
+        stat = User.objects.filter(email=email).exists()
+        if not stat:
+            message['error']='User does not exists.'
+        else:
+            change_password_link = request.build_absolute_uri(reverse('change_password'))
+            text = f'''
+                Hello user,
+                Please visit the below link to change your password.
+                
+                {change_password_link}
+                
+            '''
+            send_mail('Password Change', text, settings.DEFAULT_FROM_EMAIL, [email])
+            message['success']='Mail Sent. Please check your mailbox for further process.'
+    return render(request, 'Home/passwordreset_page.html', message)
     
-    return render(request, 'Home/passwordreset_page.html', {})
+def change_password(request):
+    if request.method == 'POST':
+        form = passwordreset(request.POST)
+        if form.is_valid():
+            email = request.session['email']
+            user = get_object_or_404(User, email=email)
+            user.password = make_password(form.cleaned_data['password'])
+            user.save()
+            return redirect('Login_page')
+    else:
+        form = passwordreset()
+    return render(request,'Home/change_password.html',{'form':form})
     
 def Option_page(request):
     return render(request, 'Home/option_page.html')

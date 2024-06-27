@@ -52,3 +52,20 @@ class UserRegistrationForm(forms.ModelForm):
         if password and confirm_password and password != confirm_password:
             self.add_error('password',"Passwords do not match")
         return cleaned_data
+
+class passwordreset(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
+    confirm_password = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if password and confirm_password:
+            if len(password) < 8 or len(password) > 15:
+                self.add_error('password', "Password must be 8 to 15 characters long")
+            if password != confirm_password:
+                self.add_error('confirm_password', "Passwords do not match")
+        
+        return cleaned_data
