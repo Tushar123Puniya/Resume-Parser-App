@@ -177,6 +177,8 @@ def dynamic_scoring(files,JD,criterias):
                 
         try :
             data[i][cgpa_id]=float(data[i][cgpa_id])
+            if data[i][cgpa_id]>10:
+                data[i][cgpa_id]/=10
         except:
             data[i][cgpa_id]=7
     

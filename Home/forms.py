@@ -1,41 +1,19 @@
 from django import forms
 from .models import User
 from django.core.exceptions import ValidationError
-from django.contrib.auth.hashers import make_password
 
-class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
-
+class UserRegistrationForm_email(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['name','email', 'password']
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise ValidationError('Email is already registered.')
-        return email
-
+        fields = ['email']
+        
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        confirm_password = cleaned_data.get('confirm_password')
-        # print(password,' ',confirm_password)
-        if password != confirm_password:
-            self.add_error('confirm_password', 'Passwords do not match.')
-        
-        if len(password)<8 or len(password)>15:
-            self.add_error('password', 'Password length should be 8 to 15 charachters long.')
-
+        email = cleaned_data.get('email')
+        stat = User.objects.filter(email=email).exists()
+        if stat:
+            self.add_error('email','This email already exists')
         return cleaned_data
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.password = make_password(self.cleaned_data['password'])  # Hash the password
-        if commit:
-            user.save()
-        return user
-
 
 class LoginForm(forms.Form):
     email = forms.EmailField(
@@ -56,3 +34,21 @@ class ResumeUploadForm(forms.Form):
 class ScoreForm(forms.Form):
     resumes = forms.FileField(widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': True}))
     resumes = forms.FileField(widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': False}))
+    
+class UserRegistrationForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
+    confirm_password = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+
+    class Meta:
+        model = User
+        fields = ['name','password']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+        if len(password)<8 or len(password)>15:
+            self.add_error('password',"Password must be 8 to 15 charachters long")
+        if password and confirm_password and password != confirm_password:
+            self.add_error('password',"Passwords do not match")
+        return cleaned_data

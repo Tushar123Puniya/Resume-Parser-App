@@ -1,13 +1,14 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
-from .forms import UserRegistrationForm,LoginForm,ResumeUploadForm,ScoreForm
+from .forms import UserRegistrationForm_email,LoginForm,ResumeUploadForm,ScoreForm,UserRegistrationForm
 from django.contrib.auth.hashers import check_password
 from .models import User
-import csv
-import os
-from django.http import HttpResponse,FileResponse
 from django.conf import settings
 from .Parsing_Model import parsing_only,similarity_scoring,dynamic_scoring
+from django.core.mail import send_mail
+import random
+from django.contrib.auth.hashers import make_password
+
 
 # Create your views here.
 def Home_page(request):
@@ -30,16 +31,65 @@ def Home_page(request):
     ]
     return render(request, 'Home/home_page.html',{'reviews' : reviews})
 
-def Signup_page(request):
+
+def send_otp(email):
+    otp = ''.join(random.choices('0123456789', k=6))  # Generate 6-digit OTP
+    message = f'Your OTP is: {otp}'
+    send_mail('OTP Verification', message, settings.DEFAULT_FROM_EMAIL, [email])
+    return otp
+
+def verify_otp(request):
+    message={
+        "error":""
+    }
+    if request.method == 'POST':
+        otp_entered = request.POST['otp']
+        otp_sent = request.session.get('otp_sent')
+        if otp_entered==otp_sent:
+            print("hello")
+            messages.success(request, 'OTP verified. You have signed up successfully.')
+            return redirect('user_detail')  # Redirect to login page
+        else:
+            message['error']= 'Invalid OTP / Email Not Found'
+    return render(request, 'Home/verify_otp.html',message)
+
+def user_detail(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Your account has been created successfully!')
-            return redirect('Option_page')
+            name = form.cleaned_data.get('name')
+            password = form.cleaned_data.get('password')
+            confirm_password = form.cleaned_data.get('confirm_password')
+
+            if password != confirm_password:
+                form.add_error('confirm_password', 'Passwords do not match.')
+            else:
+                # Assuming User model has 'name' and 'password' fields
+                user = User(
+                    name=name,  # Assuming you are using the 'username' field for the name
+                    email = request.session['email'],
+                    password=make_password(password)  # Hashing the password
+                )
+                user.save()
+                messages.success(request, 'User registered successfully.')
+                return redirect('Option_page')  
+
     else:
         form = UserRegistrationForm()
-    return render(request, 'Home/signup_page.html', {'form':form})
+
+    return render(request, 'Home/user_details.html', {'form': form})
+    
+def Signup_page(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm_email(request.POST)
+        if form.is_valid():
+            person_mail = form.cleaned_data['email']
+            request.session['email'] = person_mail
+            request.session['otp_sent'] = send_otp(person_mail)
+            return redirect('verify_otp')
+    else:
+        form = UserRegistrationForm_email()
+    return render(request, 'Home/signup_page_email.html', {'form':form})
 
 def Login_page(request):
     if request.method == 'POST':
@@ -89,7 +139,6 @@ def Scoring_page(request):
         resumes = request.FILES.getlist('resumes[]')
         job_description = request.FILES.get('job_description')
         
-        # Handle scoring options
         scoring_option = request.POST.get('scoring_option')
         
         if scoring_option=='simple':
