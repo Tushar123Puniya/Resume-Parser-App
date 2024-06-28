@@ -46,12 +46,25 @@ def verify_otp(request):
         otp_entered = request.POST['otp']
         otp_sent = request.session.get('otp_sent')
         if otp_entered==otp_sent:
-            print("hello")
             messages.success(request, 'OTP verified. You have signed up successfully.')
             return redirect('user_detail')  # Redirect to login page
         else:
             message['error']= 'Invalid OTP / Email Not Found'
     return render(request, 'Home/verify_otp.html',message)
+
+def verify_otp1(request):
+    message={
+        "error":""
+    }
+    if request.method == 'POST':
+        otp_entered = request.POST['otp']
+        otp_sent = request.session.get('otp_sent')
+        if otp_entered==otp_sent:
+            messages.success(request, 'OTP verified. You can change password now.')
+            return redirect('change_password')  # Redirect to login page
+        else:
+            message['error']= 'Invalid OTP / Email Not Found'
+    return render(request, 'Home/verify_otp1.html',message)
 
 def user_detail(request):
     if request.method == 'POST':
@@ -124,16 +137,8 @@ def Passwordreset_page(request):
         if not stat:
             message['error']='User does not exists.'
         else:
-            change_password_link = request.build_absolute_uri(reverse('change_password'))
-            text = f'''
-                Hello user,
-                Please visit the below link to change your password.
-                
-                {change_password_link}
-                
-            '''
-            send_mail('Password Change', text, settings.DEFAULT_FROM_EMAIL, [email])
-            message['success']='Mail Sent. Please check your mailbox for further process.'
+            request.session['otp_sent']=send_otp(email)
+            return redirect('verify_otp1')
     return render(request, 'Home/passwordreset_page.html', message)
     
 def change_password(request):
