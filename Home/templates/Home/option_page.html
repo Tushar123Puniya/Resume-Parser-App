@@ -44,7 +44,7 @@
         }
         h1 {
             margin-bottom: 20px;
-            font-weight:500;
+            font-weight: 500;
         }
         .button {
             display: inline-block;
@@ -68,17 +68,26 @@
         .button.score:hover {
             background: #1e88e5;
         }
+        .welcome-message {
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 400;
+            color: #007BFF;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-menu">
-            <a class="navbar-item" href="{% url 'Home_page' %}">
-                Logout
+            <a class="navbar-item" href="{% url 'Account_page' %}">
+                {{ name }}
             </a>
         </div>
     </nav>
     <div class="container">
+        <div class="welcome-message">
+            Welcome, {{ name }}!
+        </div>
         <h1>What do you want to do?</h1>
         <a href="parsing" class="button parse">Parse Resumes</a>
         <br>

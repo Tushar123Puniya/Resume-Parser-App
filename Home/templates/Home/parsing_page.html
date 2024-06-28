@@ -90,6 +90,19 @@
             cursor: pointer;
             border-radius: 5px;
         }
+        .error-message {
+            color: #e52e71;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .error-box {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -102,15 +115,19 @@
     </nav>
     <div class="container">
         <h1>Upload Resumes</h1>
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" action = " {% url 'Parsing_page' %} ">
             {% csrf_token %}
             <label for="resumes">Select Resumes:</label>
             <input type="file" id="resumes" name="resumes" multiple>
             <input type="submit" value="Download Parsed CSV">
-            {% for error in form.non_field_errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
+            <ul id="error-list">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
         </form>
     </div>
+
+
 </body>
 </html>

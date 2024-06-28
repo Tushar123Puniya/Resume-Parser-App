@@ -158,6 +158,11 @@
             <div class="field">
                 <button type="submit" class="button submit">Submit</button>
             </div>
+            <ul id="error-list">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
         </form>
     </div>
 

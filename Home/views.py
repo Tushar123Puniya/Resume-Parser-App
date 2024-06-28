@@ -150,18 +150,53 @@ def change_password(request):
     return render(request,'Home/change_password.html',{'form':form})
     
 def Option_page(request):
-    return render(request, 'Home/option_page.html')
-    
+    email = request.session['email']
+    user = get_object_or_404(User, email=email)
+    message= {
+        'name': user.name
+    }
+    return render(request, 'Home/option_page.html',message)
+
+def Account_page(request):
+    email = request.session['email']
+    user = get_object_or_404(User, email=email)
+    message={
+      'name':user.name,
+      'email':user.email,
+      'trials_left': user.trials,
+      'max_cv': user.cv_limit
+    }
+    return render(request,'Home/account_page.html',message)
+ 
 def Parsing_page(request):
     if request.method == 'POST':
         form = ResumeUploadForm(request.POST, request.FILES)
+        email = request.session['email']
+        user = get_object_or_404(User, email=email)
         if(not request.FILES):
             csv_filename=""
             form.add_error(None,'Please select at least one resume')
         elif form.is_valid():
             resumes = request.FILES.getlist('resumes')
-            csv_filename = parsing_only(resumes)
-            return csv_filename
+            if len(resumes) > user.cv_limit:
+                form.add_error(None,f'You can input upto {user.cv_limit} resumes at maximum')
+            else:
+                email = request.session['email']
+                user = get_object_or_404(User, email=email)
+                if user.trials>0:
+                    csv_filename = parsing_only(resumes)
+                    user.trials = user.trials-1
+                    user.save()
+                    if user.trials==0:
+                        text = '''
+                        Hello User,
+                        Your plan is expired, please contact us for continuing the service.
+                        Thank You
+                        '''
+                        send_mail('Plan expired', text, settings.DEFAULT_FROM_EMAIL, [email])
+                    return csv_filename
+                else:
+                    form.add_error(None,'Your Plan is expired, please contact us to continue.')
     else:
         form = ResumeUploadForm()
     return render(request,'Home/parsing_page.html', {'form':form})
@@ -175,21 +210,51 @@ def Scoring_page(request):
         
         scoring_option = request.POST.get('scoring_option')
         
-        if scoring_option=='simple':
-            print(scoring_option)
-            if not resumes:
-                form.add_error('Please upload at least one resume')
-            
-            if not job_description:
-                form.add_error('Please add job description')
+        email = request.session['email']
+        user = get_object_or_404(User, email=email)
+        
+        if len(resumes)>user.cv_limit:
+            form.add_error(None,f'You can upload a maximum of {user.cv_limit} resumes')
+        else:
+            if scoring_option=='simple':
+                print(scoring_option)
+                if not resumes:
+                    form.add_error('Please upload at least one resume')
                 
-            else:
-                csv_filename=similarity_scoring(resumes,job_description)
-                return csv_filename
-        else :
-            criteria_options = request.POST.getlist('criteria_options[]')
-            csv_filename=dynamic_scoring(resumes,job_description,criteria_options)
-            return csv_filename
+                if not job_description:
+                    form.add_error('Please add job description')
+                    
+                else:
+                    if user.trials>0:
+                        user.trials = user.trials-1
+                        user.save()
+                        if user.trials==0:
+                            text = '''
+                            Hello User,
+                            Your plan is expired, please contact us for continuing the service.
+                            Thank You
+                            '''
+                            send_mail('Plan expired', text, settings.DEFAULT_FROM_EMAIL, [email])
+                        csv_filename=similarity_scoring(resumes,job_description)
+                        return csv_filename
+                    else:
+                        form.add_error(None,'Your plan is expired please contact us to continue')
+            else :
+                if user.trials>0:
+                    user.trials = user.trials - 1
+                    user.save()
+                    if user.trials==0:
+                        text = '''
+                        Hello User,
+                        Your plan is expired, please contact us for continuing the service.
+                        Thank You
+                        '''
+                        send_mail('Plan expired', text, settings.DEFAULT_FROM_EMAIL, [email])
+                    criteria_options = request.POST.getlist('criteria_options[]')
+                    csv_filename=dynamic_scoring(resumes,job_description,criteria_options)
+                    return csv_filename
+                else:
+                    form.add_error(None,'Your plan is expired please contact us to continue')
     else:
         form = ScoreForm()
         

@@ -30,7 +30,7 @@ class LoginForm(forms.Form):
     
 class ResumeUploadForm(forms.Form):
     resumes = forms.FileField(widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': True}))
-    
+        
 class ScoreForm(forms.Form):
     resumes = forms.FileField(widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': True}))
     resumes = forms.FileField(widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': False}))
@@ -69,3 +69,16 @@ class passwordreset(forms.Form):
                 self.add_error('confirm_password', "Passwords do not match")
         
         return cleaned_data
+    
+class Acount(forms.ModelForm):
+    name = forms.CharField(label='name')
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
+    confirm_password = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
+    email = forms.EmailField(
+        max_length=254,
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+        label='Email'
+    )
+    
+    
