@@ -67,6 +67,15 @@
                 <div class="footer">
                     <p>Already have an account? <a href= "{% url 'Login_page' %} ">Login here</a></p>
                 </div>
+                {% if form.non_field_errors %}
+                    <div class="notification is-danger">
+                        <ul>
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
             </div>
         </form>
     </div>

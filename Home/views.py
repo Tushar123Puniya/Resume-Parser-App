@@ -81,9 +81,11 @@ def user_detail(request):
                 user = User(
                     name=name,  # Assuming you are using the 'username' field for the name
                     email = request.session['email'],
-                    password=make_password(password)  # Hashing the password
+                    password=make_password(password),  # Hashing the password
+                    ip_address = request.META['REMOTE_ADDR']
                 )
                 user.save()
+                
                 messages.success(request, 'User registered successfully.')
                 return redirect('Option_page')  
 
@@ -95,11 +97,16 @@ def user_detail(request):
 def Signup_page(request):
     if request.method == 'POST':
         form = UserRegistrationForm_email(request.POST)
-        if form.is_valid():
-            person_mail = form.cleaned_data['email']
-            request.session['email'] = person_mail
-            request.session['otp_sent'] = send_otp(person_mail)
-            return redirect('verify_otp')
+        curr_ip = request.META['REMOTE_ADDR']
+        stat = User.objects.filter(ip_address=curr_ip).exists()
+        if stat:
+            form.add_error(None,'This IP address already has one account.')
+        else:
+            if form.is_valid():
+                person_mail = form.cleaned_data['email']
+                request.session['email'] = person_mail
+                request.session['otp_sent'] = send_otp(person_mail)
+                return redirect('verify_otp')
     else:
         form = UserRegistrationForm_email()
     return render(request, 'Home/signup_page_email.html', {'form':form})
