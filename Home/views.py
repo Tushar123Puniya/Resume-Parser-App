@@ -10,6 +10,14 @@ import random
 from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 # Create your views here.
 def Home_page(request):
     reviews = [
@@ -82,7 +90,7 @@ def user_detail(request):
                     name=name,  # Assuming you are using the 'username' field for the name
                     email = request.session['email'],
                     password=make_password(password),  # Hashing the password
-                    ip_address = request.META['REMOTE_ADDR']
+                    ip_address = get_client_ip(request)
                 )
                 user.save()
                 
@@ -97,7 +105,7 @@ def user_detail(request):
 def Signup_page(request):
     if request.method == 'POST':
         form = UserRegistrationForm_email(request.POST)
-        curr_ip = request.META['REMOTE_ADDR']
+        curr_ip = get_client_ip(request)
         stat = User.objects.filter(ip_address=curr_ip).exists()
         if stat:
             form.add_error(None,'This IP address already has one account.')
